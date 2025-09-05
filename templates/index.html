@@ -269,6 +269,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
     <script>
         document.getElementById('learningForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -307,10 +309,15 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    document.getElementById('responseContent').textContent = data.answer;
+                    const raw = data.answer || '';
+                    const html = marked.parse(raw, { breaks: true });
+                    const safe = DOMPurify.sanitize(html, { ALLOWED_TAGS: ['b','strong','i','em','p','br','ul','ol','li','code','pre','h1','h2','h3','h4','h5','h6','blockquote','hr','a'], ALLOWED_ATTR: ['href','title','target','rel'] });
+                    const container = document.getElementById('responseContent');
+                    container.innerHTML = safe;
                     document.getElementById('response').className = 'response';
                 } else {
-                    document.getElementById('responseContent').textContent = data.error || 'An error occurred while processing your request.';
+                    const container = document.getElementById('responseContent');
+                    container.textContent = data.error || 'An error occurred while processing your request.';
                     document.getElementById('response').className = 'response error';
                 }
                 

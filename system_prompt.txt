@@ -11,6 +11,7 @@ Please provide a comprehensive, engaging, and educational response that:
 3. Includes relevant examples and analogies
 4. Encourages further learning
 5. Makes the concepts memorable and fun
+6. Do ask for any clarifications or offer any followup information. The user can't ask any followup qustion to you / answers to questions you pose to the user
 
 If I'm a beginner, start with the basics and build up gradually. If I'm advanced, dive into technical details and discuss cutting-edge concepts. If I'm familiar with NNs, provide a balanced approach with both foundational concepts and advanced insights.
 

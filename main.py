@@ -8,8 +8,16 @@ import os
 from pathlib import Path
 import requests
 import json
+import google.generativeai as genai
+from dotenv import load_dotenv
 
 app = FastAPI(title="CNN Learning Assistant", description="AI-powered CNN tutor")
+
+# Load environment variables
+load_dotenv()
+
+# Configure Gemini
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Mount static files and templates
 templates = Jinja2Templates(directory="templates")
@@ -26,32 +34,27 @@ def load_system_prompt():
     else:
         return "Be a very effective, lucid and fun teacher of CNNs to students."
 
-def call_local_llm(prompt: str) -> str:
+def call_gemini_llm(prompt: str) -> str:
     """
-    Call a local LLM. This is a placeholder implementation.
-    You can replace this with your preferred local LLM setup like:
-    - Ollama
-    - LM Studio
-    - Local transformers model
-    - etc.
+    Call Gemini 2.0 Flash model via Google's Generative AI API
     """
     try:
-        # Example using Ollama (uncomment and modify if you have Ollama running)
-        # response = requests.post(
-        #     "http://localhost:11434/api/generate",
-        #     json={
-        #         "model": "llama2",  # or your preferred model
-        #         "prompt": prompt,
-        #         "stream": False
-        #     }
-        # )
-        # return response.json()["response"]
+        # Initialize the model
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
-        # For now, return a mock response based on the learning level and question
-        return generate_mock_response(prompt)
+        # Generate response
+        response = model.generate_content(prompt)
+        
+        if response.text:
+            return response.text
+        else:
+            # Fallback to mock response if Gemini fails
+            return generate_mock_response(prompt)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"LLM call failed: {str(e)}")
+        print(f"Gemini API error: {str(e)}")
+        # Fallback to mock response if API fails
+        return generate_mock_response(prompt)
 
 def generate_mock_response(prompt: str) -> str:
     """Generate a mock response for demonstration purposes"""
@@ -114,8 +117,8 @@ async def ask_question(request: LearningRequest):
             topic_to_learn=request.topic_to_learn
         )
         
-        # Call the local LLM
-        response = call_local_llm(formatted_prompt)
+        # Call Gemini 2.0 Flash
+        response = call_gemini_llm(formatted_prompt)
         
         return {"answer": response}
         

@@ -31,19 +31,28 @@ An AI-powered web application that provides personalized teaching about Convolut
 2. **Ask Your Question**: Type any question about CNNs in the text area
 3. **Get Personalized Answer**: Receive a tailored response that matches your learning level
 
-## Local LLM Integration
+## LLM Integration
 
-The app is designed to work with local LLMs. Currently, it includes mock responses for demonstration. To integrate with a real local LLM:
+The app is now integrated with **Gemini 2.0 Flash** for real AI responses!
 
-1. **Ollama Setup** (recommended):
-   - Install Ollama: https://ollama.ai/
-   - Pull a model: `ollama pull llama2`
-   - Uncomment the Ollama code in `main.py`
+### Setup Gemini API:
 
-2. **Other Options**:
-   - LM Studio
-   - Local transformers models
-   - Custom LLM APIs
+1. **Get API Key**:
+   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create a new API key
+
+2. **Configure Environment**:
+   - Create a `.env` file in the project root
+   - Add your API key: `GEMINI_API_KEY=your_api_key_here`
+
+3. **Run the App**:
+   ```bash
+   uv run main.py
+   ```
+
+### Fallback System:
+- If Gemini API fails or is unavailable, the app automatically falls back to intelligent mock responses
+- This ensures the app always works, even without internet or API access
 
 ## Project Structure
 

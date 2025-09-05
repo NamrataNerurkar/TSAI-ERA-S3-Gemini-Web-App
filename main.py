@@ -10,14 +10,26 @@ import requests
 import json
 import google.generativeai as genai
 from dotenv import load_dotenv
+import logging
+import time
+from uuid import uuid4
 
 app = FastAPI(title="CNN Learning Assistant", description="AI-powered CNN tutor")
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s'
+)
+logger = logging.getLogger("cnn-learning-assistant")
 
 # Load environment variables
 load_dotenv()
 
 # Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+GENAI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GENAI_API_KEY)
+MODEL_NAME = 'gemini-2.0-flash-exp'
 
 # Mount static files and templates
 templates = Jinja2Templates(directory="templates")
@@ -107,22 +119,36 @@ async def read_root(request: Request):
 @app.post("/ask")
 async def ask_question(request: LearningRequest):
     """Process learning request and return AI response"""
+    trace_id = str(uuid4())
+    start_time = time.time()
+    topic_preview = request.topic_to_learn[:60].replace('\n', ' ')
+    logger.info(f"trace_id={trace_id} | stage=request_received | learning_level='{request.learning_level}' | topic_preview='{topic_preview}'")
     try:
         # Load system prompt
         system_prompt = load_system_prompt()
+        logger.info(f"trace_id={trace_id} | stage=system_prompt_loaded | prompt_len={len(system_prompt)}")
         
         # Format the prompt with user inputs
         formatted_prompt = system_prompt.format(
             learning_level=request.learning_level,
             topic_to_learn=request.topic_to_learn
         )
+        logger.info(f"trace_id={trace_id} | stage=prompt_formatted | total_len={len(formatted_prompt)}")
         
         # Call Gemini 2.0 Flash
+        llm_start = time.time()
         response = call_gemini_llm(formatted_prompt)
+        llm_ms = int((time.time() - llm_start) * 1000)
+        answer_preview = response[:80].replace('\n', ' ')
+        logger.info(f"trace_id={trace_id} | stage=llm_response_received | model={MODEL_NAME} | duration_ms={llm_ms} | answer_preview='{answer_preview}'")
         
+        total_ms = int((time.time() - start_time) * 1000)
+        logger.info(f"trace_id={trace_id} | stage=response_returned | total_duration_ms={total_ms}")
         return {"answer": response}
         
     except Exception as e:
+        total_ms = int((time.time() - start_time) * 1000)
+        logger.exception(f"trace_id={trace_id} | stage=error | total_duration_ms={total_ms} | error={str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 def main():

@@ -69,7 +69,7 @@ For your specific question, here are some advanced considerations:
 - Efficient architectures like MobileNet or EfficientNet
 - Advanced regularization techniques
 
-Would you like me to elaborate on any of these aspects or discuss recent research in this area?"""
+These concepts represent the cutting edge of computer vision research, combining traditional CNN principles with modern architectural innovations for improved performance and efficiency."""
     
     elif "Familiar with NNs" in prompt:
         return """Excellent! Since you're familiar with neural networks, let me explain CNNs in that context.
@@ -83,7 +83,7 @@ Here's how it works:
 
 The beauty of CNNs is parameter sharing - the same filter is applied across the entire image, making them translation-invariant and much more efficient than fully connected networks for images.
 
-What specific aspect of CNNs would you like to explore further?"""
+This architecture makes CNNs particularly powerful for computer vision tasks, from image classification to object detection and semantic segmentation."""
     
     else:  # Beginner
         return """Welcome to the amazing world of CNNs! Let me explain this in simple terms.
@@ -97,7 +97,7 @@ Here's a simple analogy:
 
 The "convolutional" part means the network uses small filters that slide across the image, looking for patterns - just like how you might scan a picture with your eyes.
 
-Don't worry if this seems complex - we'll build up your understanding step by step! What would you like to know more about first?"""
+This approach allows computers to "see" and understand images in a way that's similar to human vision, making them incredibly useful for tasks like recognizing faces, detecting objects, and even helping doctors analyze medical images."""
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
